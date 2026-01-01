@@ -3,7 +3,7 @@
 //! 包含所有可用的子命令实现
 
 pub mod add;
-pub mod import_;
+pub mod import;
 pub mod init;
 pub mod install;
 pub mod list;
@@ -12,7 +12,7 @@ pub mod use_cmd;
 
 // Re-export for easier access
 pub use add::execute as add;
-pub use import_::execute as import;
+pub use import::execute as import;
 pub use init::execute as init;
 pub use install::execute as install;
 pub use list::execute as list;

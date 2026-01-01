@@ -46,11 +46,11 @@ fn create_initial_settings(path: &PathBuf) {
 #[test]
 #[allow(deprecated)]
 fn test_help_command() {
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("help")
         .assert()
         .success()
-        .stdout(predicate::str::contains("CCC (Claude Code Config)"));
+        .stdout(predicate::str::contains("Claude Code 配置管理工具"));
 }
 
 #[test]
@@ -61,7 +61,7 @@ fn test_init_command() {
     // 创建初始 settings.json
     create_initial_settings(&settings_path);
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
     // 验证配置文件创建
@@ -80,11 +80,11 @@ fn test_list_empty() {
     create_initial_settings(&settings_path);
 
     // 先初始化
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
     // list 应该显示无配置档案
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("list")
         .assert()
         .success()
@@ -101,11 +101,11 @@ fn test_import_and_list() {
     create_initial_settings(&settings_path);
 
     // 初始化
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
     // 导入当前配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("import")
         .arg("anthropic")
         .assert()
@@ -126,7 +126,7 @@ fn test_import_and_list() {
     );
 
     // list 应该显示配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("list")
         .assert()
         .success()
@@ -143,10 +143,10 @@ fn test_use_command_updates_settings() {
     create_initial_settings(&settings_path);
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("import").arg("anthropic").assert().success();
 
     // 准备另一个配置
@@ -164,7 +164,7 @@ fn test_use_command_updates_settings() {
     std::fs::write(&ccc_config_path, config).unwrap();
 
     // 切换到新配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("use")
         .arg("new-profile")
         .assert()
@@ -198,15 +198,15 @@ fn test_remove_command() {
     create_initial_settings(&settings_path);
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("import").arg("test-profile").assert().success();
 
     // 删除配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
-    cmd.arg("rm")
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("remove")
         .arg("test-profile")
         .assert()
         .success()
@@ -227,19 +227,19 @@ fn test_remove_current_profile() {
     create_initial_settings(&settings_path);
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("import").arg("current").assert().success();
 
     // 切换到当前配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("use").arg("current").assert().success();
 
     // 删除当前配置
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
-    cmd.arg("rm")
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("remove")
         .arg("current")
         .assert()
         .success()
@@ -257,8 +257,8 @@ fn test_remove_current_profile() {
 fn test_import_nonexistent_profile() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
-    cmd.arg("rm")
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("remove")
         .arg("nonexistent")
         .assert()
         .failure()
@@ -270,7 +270,7 @@ fn test_import_nonexistent_profile() {
 fn test_use_nonexistent_profile() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("use")
         .arg("nonexistent")
         .assert()
@@ -283,7 +283,7 @@ fn test_use_nonexistent_profile() {
 fn test_import_invalid_name() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("import")
         .arg("invalid name with spaces")
         .assert()
@@ -295,6 +295,28 @@ fn test_import_invalid_name() {
 fn test_add_invalid_name() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
 
-    let mut cmd = Command::cargo_bin("claude-code-config-rs").unwrap();
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("add").arg("invalid@name").assert().failure();
+}
+
+#[test]
+#[allow(deprecated)]
+fn test_remove_command_del_alias() {
+    let (_temp_dir, settings_path, _ccc_config_path) = setup_temp_home();
+
+    create_initial_settings(&settings_path);
+
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("init").assert().success();
+
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("import").arg("test-alias").assert().success();
+
+    // 使用 del 别名删除配置
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("del")
+        .arg("test-alias")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("已删除"));
 }

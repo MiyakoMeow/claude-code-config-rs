@@ -28,7 +28,10 @@ pub struct ClaudeEnv {
     #[serde(rename = "ANTHROPIC_BASE_URL", skip_serializing_if = "Option::is_none")]
     pub anthropic_base_url: Option<String>,
     /// Anthropic API Key
-    #[serde(rename = "ANTHROPIC_AUTH_TOKEN", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ANTHROPIC_AUTH_TOKEN",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub anthropic_api_key: Option<String>,
 }
 

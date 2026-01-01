@@ -4,16 +4,9 @@
 
 use clap::{Parser, Subcommand};
 
-mod commands;
-mod config;
-mod output;
-
-// Re-export for convenience
-use commands::{add, import, init, install, list, remove, use_cmd};
-
 /// CLI 参数解析
 #[derive(Parser, Debug)]
-#[command(name = "ccc")]
+#[command(name = "cccrs")]
 #[command(author = "MiyakoMeow")]
 #[command(version = "0.1.0")]
 #[command(about = "Claude Code 配置管理工具", long_about = None)]
@@ -42,6 +35,7 @@ enum Commands {
         name: String,
     },
     /// 删除指定配置档案
+    #[command(alias = "del")]
     Remove {
         /// 配置名称
         name: String,
@@ -55,6 +49,7 @@ enum Commands {
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
+    use claude_code_config_rs::commands::{add, import, init, install, list, remove, use_cmd};
 
     match args.command {
         Commands::Install => install(),

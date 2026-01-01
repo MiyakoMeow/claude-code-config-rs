@@ -38,7 +38,10 @@ pub struct EnvConfig {
     #[serde(skip_serializing_if = "Option::is_none", rename = "ANTHROPIC_BASE_URL")]
     pub anthropic_base_url: Option<String>,
     /// Anthropic API Key
-    #[serde(skip_serializing_if = "Option::is_none", rename = "ANTHROPIC_AUTH_TOKEN")]
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        rename = "ANTHROPIC_AUTH_TOKEN"
+    )]
     pub anthropic_api_key: Option<String>,
 }
 
@@ -183,7 +186,7 @@ mod tests {
                 Some("sk-test".to_string()),
             ),
         );
-        config.insert_profile("test".to_string(), profile.clone());
+        config.insert_profile("test".to_string(), profile);
         config.current = Some("test".to_string());
 
         config.save().unwrap();
