@@ -46,7 +46,7 @@ pub fn execute(name: &str) -> anyhow::Result<()> {
                     .env
                     .as_ref()
                     .and_then(|e| e.anthropic_api_key.clone())
-                    .ok_or_else(|| anyhow::anyhow!("settings.json 中缺少 ANTHROPIC_API_KEY"))?,
+                    .ok_or_else(|| anyhow::anyhow!("settings.json 中缺少 ANTHROPIC_AUTH_TOKEN"))?,
             ),
         },
     };

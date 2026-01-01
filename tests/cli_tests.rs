@@ -36,7 +36,7 @@ fn create_initial_settings(path: &PathBuf) {
     "otherField": "should remain",
     "env": {
         "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
-        "ANTHROPIC_API_KEY": "sk-test-key"
+        "ANTHROPIC_AUTH_TOKEN": "sk-test-key"
     }
 }"#,
     )
@@ -121,7 +121,7 @@ fn test_import_and_list() {
         "https://api.anthropic.com"
     );
     assert_eq!(
-        config["profiles"]["anthropic"]["env"]["ANTHROPIC_API_KEY"],
+        config["profiles"]["anthropic"]["env"]["ANTHROPIC_AUTH_TOKEN"],
         "sk-test-key"
     );
 
@@ -155,7 +155,7 @@ fn test_use_command_updates_settings() {
             "new-profile": {
                 "env": {
                     "ANTHROPIC_BASE_URL": "https://api.new.com",
-                    "ANTHROPIC_API_KEY": "sk-new-key"
+                    "ANTHROPIC_AUTH_TOKEN": "sk-new-key"
                 }
             }
         },
@@ -176,7 +176,7 @@ fn test_use_command_updates_settings() {
     let settings: serde_json::Value = serde_json::from_str(&settings_content).unwrap();
 
     assert_eq!(settings["env"]["ANTHROPIC_BASE_URL"], "https://api.new.com");
-    assert_eq!(settings["env"]["ANTHROPIC_API_KEY"], "sk-new-key");
+    assert_eq!(settings["env"]["ANTHROPIC_AUTH_TOKEN"], "sk-new-key");
     assert_eq!(settings["otherField"], "should remain");
 
     // 验证备份文件已创建

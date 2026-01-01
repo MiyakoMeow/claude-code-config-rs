@@ -28,7 +28,7 @@ pub struct ClaudeEnv {
     #[serde(rename = "ANTHROPIC_BASE_URL", skip_serializing_if = "Option::is_none")]
     pub anthropic_base_url: Option<String>,
     /// Anthropic API Key
-    #[serde(rename = "ANTHROPIC_API_KEY", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "ANTHROPIC_AUTH_TOKEN", skip_serializing_if = "Option::is_none")]
     pub anthropic_api_key: Option<String>,
 }
 
@@ -76,7 +76,7 @@ impl ClaudeSettings {
                 updated["env"]["ANTHROPIC_BASE_URL"] = serde_json::json!(url);
             }
             if let Some(key) = &env.anthropic_api_key {
-                updated["env"]["ANTHROPIC_API_KEY"] = serde_json::json!(key);
+                updated["env"]["ANTHROPIC_AUTH_TOKEN"] = serde_json::json!(key);
             }
         }
 

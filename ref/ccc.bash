@@ -208,7 +208,7 @@ detect_active_profile() {
     local current_api_key_helper current_base_url current_api_key
     current_api_key_helper=$(jq -r '.apiKeyHelper // empty' "$CLAUDE_SETTINGS" 2>/dev/null || echo "")
     current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL // empty' "$CLAUDE_SETTINGS" 2>/dev/null || echo "")
-    current_api_key=$(jq -r '.env.ANTHROPIC_API_KEY // empty' "$CLAUDE_SETTINGS" 2>/dev/null || echo "")
+    current_api_key=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' "$CLAUDE_SETTINGS" 2>/dev/null || echo "")
 
     # 遍历所有配置档案进行比较
     local profiles
@@ -231,7 +231,7 @@ detect_active_profile() {
         local profile_api_key_helper profile_base_url profile_api_key
         profile_api_key_helper=$(echo "$profile_details" | jq -r '.apiKeyHelper // empty' 2>/dev/null || echo "")
         profile_base_url=$(echo "$profile_details" | jq -r '.env.ANTHROPIC_BASE_URL // empty' 2>/dev/null || echo "")
-        profile_api_key=$(echo "$profile_details" | jq -r '.env.ANTHROPIC_API_KEY // empty' 2>/dev/null || echo "")
+        profile_api_key=$(echo "$profile_details" | jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' 2>/dev/null || echo "")
 
         # 比较核心字段是否匹配（base_url 和 api_key 是必须的）
         if [[ "${current_base_url:-}" == "${profile_base_url:-}" ]] && \
@@ -293,7 +293,7 @@ extract_current_settings() {
 
     apiKeyHelper=$(jq -r '.apiKeyHelper // empty' "$CLAUDE_SETTINGS")
     baseUrl=$(jq -r '.env.ANTHROPIC_BASE_URL // empty' "$CLAUDE_SETTINGS")
-    apiKey=$(jq -r '.env.ANTHROPIC_API_KEY // empty' "$CLAUDE_SETTINGS")
+    apiKey=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' "$CLAUDE_SETTINGS")
 
     jq -n \
         --arg apiKeyHelper "$apiKeyHelper" \
@@ -303,7 +303,7 @@ extract_current_settings() {
             apiKeyHelper: (if $apiKeyHelper == "" then null else $apiKeyHelper end),
             env: {
                 ANTHROPIC_BASE_URL: (if $baseUrl == "" then null else $baseUrl end),
-                ANTHROPIC_API_KEY: (if $apiKey == "" then null else $apiKey end)
+                ANTHROPIC_AUTH_TOKEN: (if $apiKey == "" then null else $apiKey end)
             }
         }'
 }
@@ -326,7 +326,7 @@ apply_profile_to_settings() {
         '
         .apiKeyHelper = ($profile.apiKeyHelper // .apiKeyHelper) |
         .env.ANTHROPIC_BASE_URL = ($profile.env.ANTHROPIC_BASE_URL // .env.ANTHROPIC_BASE_URL) |
-        .env.ANTHROPIC_API_KEY = ($profile.env.ANTHROPIC_API_KEY // .env.ANTHROPIC_API_KEY)
+        .env.ANTHROPIC_AUTH_TOKEN = ($profile.env.ANTHROPIC_AUTH_TOKEN // .env.ANTHROPIC_AUTH_TOKEN)
         ' \
         "$CLAUDE_SETTINGS" > "$temp_file" && mv "$temp_file" "$CLAUDE_SETTINGS" || {
         rm -f "$temp_file"
@@ -432,7 +432,7 @@ cmd_list() {
         local api_key_helper base_url api_key
         api_key_helper=$(echo "$details" | jq -r '.apiKeyHelper // "未设置"')
         base_url=$(echo "$details" | jq -r '.env.ANTHROPIC_BASE_URL // "未设置"')
-        api_key=$(echo "$details" | jq -r '.env.ANTHROPIC_API_KEY // "未设置"')
+        api_key=$(echo "$details" | jq -r '.env.ANTHROPIC_AUTH_TOKEN // "未设置"')
 
         # 隐藏 API Key Helper 的具体内容
         if [[ "$api_key_helper" != "未设置" ]]; then
@@ -462,7 +462,7 @@ cmd_list() {
         # 检查是否有当前配置但未匹配任何档案
         ensure_claude_settings
         local has_config
-        has_config=$(jq -r '.env.ANTHROPIC_API_KEY // empty' "$CLAUDE_SETTINGS" 2>/dev/null)
+        has_config=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' "$CLAUDE_SETTINGS" 2>/dev/null)
 
         if [[ -n "$has_config" ]]; then
             echo -e "${YELLOW}当前配置未保存为档案${NC}"
@@ -542,7 +542,7 @@ cmd_add() {
                 apiKeyHelper: $apiKeyHelper,
                 env: {
                     ANTHROPIC_BASE_URL: $baseUrl,
-                    ANTHROPIC_API_KEY: $apiKey
+                    ANTHROPIC_AUTH_TOKEN: $apiKey
                 }
             }')
     else
@@ -552,7 +552,7 @@ cmd_add() {
             '{
                 env: {
                     ANTHROPIC_BASE_URL: $baseUrl,
-                    ANTHROPIC_API_KEY: $apiKey
+                    ANTHROPIC_AUTH_TOKEN: $apiKey
                 }
             }')
     fi

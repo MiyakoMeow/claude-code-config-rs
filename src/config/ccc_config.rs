@@ -38,7 +38,7 @@ pub struct EnvConfig {
     #[serde(skip_serializing_if = "Option::is_none", rename = "ANTHROPIC_BASE_URL")]
     pub anthropic_base_url: Option<String>,
     /// Anthropic API Key
-    #[serde(skip_serializing_if = "Option::is_none", rename = "ANTHROPIC_API_KEY")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "ANTHROPIC_AUTH_TOKEN")]
     pub anthropic_api_key: Option<String>,
 }
 

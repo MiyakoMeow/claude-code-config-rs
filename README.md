@@ -78,7 +78,7 @@ ccc rm <配置名称>
       "apiKeyHelper": "命令（可选）",
       "env": {
         "ANTHROPIC_BASE_URL": "Base URL",
-        "ANTHROPIC_API_KEY": "API Key"
+        "ANTHROPIC_AUTH_TOKEN": "API Key"
       }
     }
   },
@@ -92,7 +92,7 @@ ccc rm <配置名称>
 CCC 只会修改以下字段，其他字段保持不变：
 - `apiKeyHelper`
 - `env.ANTHROPIC_BASE_URL`
-- `env.ANTHROPIC_API_KEY`
+- `env.ANTHROPIC_AUTH_TOKEN`
 
 ## 使用示例
 
