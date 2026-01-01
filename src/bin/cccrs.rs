@@ -35,7 +35,7 @@ enum Commands {
         name: String,
     },
     /// 删除指定配置档案
-    #[command(alias = "del")]
+    #[command(alias = "del", alias = "rm")]
     Remove {
         /// 配置名称
         name: String,
