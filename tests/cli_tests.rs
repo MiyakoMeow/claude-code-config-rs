@@ -5,6 +5,7 @@
 #[allow(deprecated)]
 use assert_cmd::Command;
 use predicates::prelude::*;
+use serial_test::serial;
 use std::path::PathBuf;
 use tempfile::TempDir;
 
@@ -20,9 +21,14 @@ fn setup_temp_home() -> (TempDir, PathBuf, PathBuf) {
     let settings_path = claude_dir.join("settings.json");
     let ccc_config_path = claude_dir.join("ccc-config.json");
 
-    // 设置 HOME 环境变量
+    // 设置 HOME 环境变量 (Unix/Linux)
     unsafe {
         std::env::set_var("HOME", temp_home.to_string_lossy().as_ref());
+    }
+
+    // 设置 USERPROFILE 环境变量 (Windows)
+    unsafe {
+        std::env::set_var("USERPROFILE", temp_home.to_string_lossy().as_ref());
     }
 
     (temp_dir, settings_path, ccc_config_path)
@@ -44,6 +50,7 @@ fn create_initial_settings(path: &PathBuf) {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_help_command() {
     let mut cmd = Command::cargo_bin("cccrs").unwrap();
@@ -54,6 +61,7 @@ fn test_help_command() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_init_command() {
     let (_temp_dir, settings_path, ccc_config_path) = setup_temp_home();
@@ -72,6 +80,7 @@ fn test_init_command() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_list_empty() {
     let (_temp_dir, settings_path, _ccc_config_path) = setup_temp_home();
@@ -93,6 +102,7 @@ fn test_list_empty() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_import_and_list() {
     let (_temp_dir, settings_path, ccc_config_path) = setup_temp_home();
@@ -135,6 +145,7 @@ fn test_import_and_list() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_use_command_updates_settings() {
     let (temp_dir, settings_path, ccc_config_path) = setup_temp_home();
@@ -190,6 +201,7 @@ fn test_use_command_updates_settings() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_remove_command() {
     let (_temp_dir, settings_path, ccc_config_path) = setup_temp_home();
@@ -219,6 +231,7 @@ fn test_remove_command() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_remove_current_profile() {
     let (_temp_dir, settings_path, ccc_config_path) = setup_temp_home();
@@ -253,6 +266,7 @@ fn test_remove_current_profile() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_import_nonexistent_profile() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
@@ -266,6 +280,7 @@ fn test_import_nonexistent_profile() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_use_nonexistent_profile() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
@@ -279,6 +294,7 @@ fn test_use_nonexistent_profile() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_import_invalid_name() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
@@ -291,6 +307,7 @@ fn test_import_invalid_name() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_add_invalid_name() {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home();
@@ -300,6 +317,7 @@ fn test_add_invalid_name() {
 }
 
 #[test]
+#[serial]
 #[allow(deprecated)]
 fn test_remove_command_del_alias() {
     let (_temp_dir, settings_path, _ccc_config_path) = setup_temp_home();
@@ -316,6 +334,29 @@ fn test_remove_command_del_alias() {
     let mut cmd = Command::cargo_bin("cccrs").unwrap();
     cmd.arg("del")
         .arg("test-alias")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("已删除"));
+}
+
+#[test]
+#[serial]
+#[allow(deprecated)]
+fn test_remove_command_rm_alias() {
+    let (_temp_dir, settings_path, _ccc_config_path) = setup_temp_home();
+
+    create_initial_settings(&settings_path);
+
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("init").assert().success();
+
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("import").arg("test-rm-alias").assert().success();
+
+    // 使用 rm 别名删除配置
+    let mut cmd = Command::cargo_bin("cccrs").unwrap();
+    cmd.arg("rm")
+        .arg("test-rm-alias")
         .assert()
         .success()
         .stdout(predicate::str::contains("已删除"));
