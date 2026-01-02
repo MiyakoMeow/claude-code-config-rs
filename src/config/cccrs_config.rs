@@ -100,7 +100,7 @@ impl CccConfig {
 impl Profile {
     /// 创建新的配置档案
     #[must_use]
-    pub fn new(api_key_helper: Option<String>, env: EnvConfig) -> Self {
+    pub const fn new(api_key_helper: Option<String>, env: EnvConfig) -> Self {
         Self {
             api_key_helper,
             env,
@@ -111,7 +111,7 @@ impl Profile {
 impl EnvConfig {
     /// 创建新的环境配置
     #[must_use]
-    pub fn new(anthropic_base_url: Option<String>, anthropic_api_key: Option<String>) -> Self {
+    pub const fn new(anthropic_base_url: Option<String>, anthropic_api_key: Option<String>) -> Self {
         Self {
             anthropic_base_url,
             anthropic_api_key,

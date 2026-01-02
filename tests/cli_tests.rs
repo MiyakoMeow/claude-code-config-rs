@@ -1,6 +1,6 @@
 //! CLI 测试模块
 //!
-//! 使用 assert_cmd 进行 CLI 行为测试
+//! 使用 `assert_cmd` 进行 CLI 行为测试
 
 #[allow(deprecated)]
 use assert_cmd::Command;
@@ -195,7 +195,7 @@ fn test_use_command_updates_settings() {
     use claude_code_config_rs::config::paths::CLAUDE_DIR;
     let backups: Vec<_> = std::fs::read_dir(temp_dir.path().join("test_home").join(CLAUDE_DIR))
         .unwrap()
-        .filter_map(|e| e.ok())
+        .filter_map(std::result::Result::ok)
         .map(|e| e.path())
         .filter(|p| p.to_string_lossy().contains("backup"))
         .collect();
