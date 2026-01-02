@@ -66,6 +66,7 @@ impl CccConfig {
     ///
     /// 返回文件写入错误
     pub fn save(&self) -> Result<()> {
+        ensure_ccc_config_exists().context("创建配置文件失败")?;
         let path = get_ccc_config_path();
         let content = serde_json::to_string_pretty(self).context("序列化配置失败")?;
         std::fs::write(&path, content).context("写入配置文件失败")
