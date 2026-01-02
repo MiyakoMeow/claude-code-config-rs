@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/MiyakoMeow/claude-code-config-rs/compare/v0.1.0...v0.2.0) (2026-01-02)
+
+
+### Features
+
+* **ci:** add targets ([#13](https://github.com/MiyakoMeow/claude-code-config-rs/issues/13)) ([4bb821e](https://github.com/MiyakoMeow/claude-code-config-rs/commit/4bb821eb24b1a4d55ef02babd79dd404c45a26b2))
+
 ## 0.1.0 (2026-01-02)
 
 
