@@ -60,26 +60,38 @@ impl ClaudeSettings {
         // 读取现有文件，保留其他字段
         let existing: serde_json::Value = if path.exists() {
             let content = std::fs::read_to_string(&path).context("读取 settings 失败")?;
-            serde_json::from_str(&content).unwrap_or_default()
+            serde_json::from_str(&content).context("解析现有 settings 失败")?
         } else {
             serde_json::json!({})
         };
 
         // 只更新我们管理的字段
         let mut updated = existing;
-        if let Some(helper) = &self.api_key_helper {
-            updated["apiKeyHelper"] = serde_json::json!(helper);
+        if let Some(helper) = &self.api_key_helper
+            && let Some(obj) = updated.as_object_mut()
+        {
+            obj.insert("apiKeyHelper".to_string(), serde_json::json!(helper));
         }
 
         if let Some(env) = &self.env {
-            if updated["env"].is_null() || !updated["env"].is_object() {
-                updated["env"] = serde_json::json!({});
+            if updated
+                .get("env")
+                .is_none_or(|v| v.is_null() || !v.is_object())
+                && let Some(obj) = updated.as_object_mut()
+            {
+                obj.insert("env".to_string(), serde_json::json!({}));
             }
-            if let Some(url) = &env.anthropic_base_url {
-                updated["env"]["ANTHROPIC_BASE_URL"] = serde_json::json!(url);
+            if let Some(url) = &env.anthropic_base_url
+                && let Some(obj) = updated.as_object_mut()
+                && let Some(env_obj) = obj.get_mut("env").and_then(|v| v.as_object_mut())
+            {
+                env_obj.insert("ANTHROPIC_BASE_URL".to_string(), serde_json::json!(url));
             }
-            if let Some(key) = &env.anthropic_api_key {
-                updated["env"]["ANTHROPIC_AUTH_TOKEN"] = serde_json::json!(key);
+            if let Some(key) = &env.anthropic_api_key
+                && let Some(obj) = updated.as_object_mut()
+                && let Some(env_obj) = obj.get_mut("env").and_then(|v| v.as_object_mut())
+            {
+                env_obj.insert("ANTHROPIC_AUTH_TOKEN".to_string(), serde_json::json!(key));
             }
         }
 
@@ -106,22 +118,23 @@ mod tests {
     use super::*;
     use tempfile::TempDir;
 
-    fn setup_temp_settings() -> (TempDir, ClaudeSettings) {
-        let temp_dir = TempDir::new().unwrap();
+    fn setup_temp_settings() -> Result<(TempDir, ClaudeSettings)> {
+        let temp_dir = TempDir::new().context("创建临时目录失败")?;
         let temp_home = temp_dir.path().join("home");
-        std::fs::create_dir_all(&temp_home).unwrap();
+        std::fs::create_dir_all(&temp_home).context("创建临时 HOME 目录失败")?;
         unsafe {
             std::env::set_var("HOME", temp_home.to_string_lossy().as_ref());
         }
 
         use crate::config::paths::{CLAUDE_DIR, SETTINGS_FILE};
         let claude_dir = temp_home.join(CLAUDE_DIR);
-        std::fs::create_dir_all(&claude_dir).unwrap();
+        std::fs::create_dir_all(&claude_dir).context("创建 Claude 目录失败")?;
 
         let settings_path = claude_dir.join(SETTINGS_FILE);
-        std::fs::write(&settings_path, r#"{"otherField":"value"}"#).unwrap();
+        std::fs::write(&settings_path, r#"{"otherField":"value"}"#)
+            .context("写入测试 settings 失败")?;
 
-        (temp_dir, ClaudeSettings::default())
+        Ok((temp_dir, ClaudeSettings::default()))
     }
 
     #[test]
@@ -131,13 +144,16 @@ mod tests {
     }
 
     #[test]
-    fn test_backup() {
-        let (_temp_dir, settings) = setup_temp_settings();
-        let backup_path = settings.backup().unwrap();
-        assert!(backup_path.exists());
+    fn test_backup() -> anyhow::Result<()> {
+        let (_temp_dir, settings) = setup_temp_settings()?;
+        let backup_path = settings.backup().context("备份失败")?;
+        if !backup_path.exists() {
+            anyhow::bail!("备份文件不存在");
+        }
 
         let path = get_claude_settings_path();
-        std::fs::read_to_string(&path).unwrap();
-        std::fs::read_to_string(&backup_path).unwrap();
+        std::fs::read_to_string(&path).context("读取原文件失败")?;
+        std::fs::read_to_string(&backup_path).context("读取备份文件失败")?;
+        Ok(())
     }
 }

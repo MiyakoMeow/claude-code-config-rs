@@ -54,7 +54,7 @@ impl CccConfig {
     ///
     /// 返回文件读取错误或 JSON 解析错误
     pub fn load() -> Result<Self> {
-        ensure_ccc_config_exists().ok();
+        ensure_ccc_config_exists().context("创建配置文件失败")?;
         let path = get_ccc_config_path();
         let content = std::fs::read_to_string(&path).context("读取配置文件失败")?;
         serde_json::from_str(&content).context("解析配置文件失败")
@@ -111,7 +111,10 @@ impl Profile {
 impl EnvConfig {
     /// 创建新的环境配置
     #[must_use]
-    pub const fn new(anthropic_base_url: Option<String>, anthropic_api_key: Option<String>) -> Self {
+    pub const fn new(
+        anthropic_base_url: Option<String>,
+        anthropic_api_key: Option<String>,
+    ) -> Self {
         Self {
             anthropic_base_url,
             anthropic_api_key,
@@ -124,28 +127,33 @@ mod tests {
     use super::*;
     use tempfile::TempDir;
 
-    fn setup_temp_config() -> (TempDir, CccConfig) {
-        let temp_dir = TempDir::new().unwrap();
+    fn setup_temp_config() -> Result<(TempDir, CccConfig)> {
+        let temp_dir = TempDir::new().context("创建临时目录失败")?;
         let temp_home = temp_dir.path().join("home");
-        std::fs::create_dir_all(&temp_home).unwrap();
+        std::fs::create_dir_all(&temp_home).context("创建临时 HOME 目录失败")?;
         unsafe {
             std::env::set_var("HOME", temp_home.to_string_lossy().as_ref());
         }
 
         let config = CccConfig::default();
-        (temp_dir, config)
+        Ok((temp_dir, config))
     }
 
     #[test]
-    fn test_empty_config() {
-        let (_temp_dir, config) = setup_temp_config();
-        assert!(config.profiles.is_empty());
-        assert!(config.current.is_none());
+    fn test_empty_config() -> Result<()> {
+        let (_temp_dir, config) = setup_temp_config()?;
+        if !config.profiles.is_empty() {
+            anyhow::bail!("配置不为空");
+        }
+        if config.current.is_some() {
+            anyhow::bail!("当前配置应为空");
+        }
+        Ok(())
     }
 
     #[test]
-    fn test_profile_insert_and_get() {
-        let (_temp_dir, mut config) = setup_temp_config();
+    fn test_profile_insert_and_get() -> Result<()> {
+        let (_temp_dir, mut config) = setup_temp_config()?;
         let profile = Profile::new(
             Some("echo test".to_string()),
             EnvConfig::new(
@@ -154,13 +162,18 @@ mod tests {
             ),
         );
         config.insert_profile("test".to_string(), profile.clone());
-        assert!(config.has_profile("test"));
-        assert_eq!(config.get_profile("test"), Some(&profile));
+        if !config.has_profile("test") {
+            anyhow::bail!("配置档案不存在");
+        }
+        if config.get_profile("test") != Some(&profile) {
+            anyhow::bail!("配置档案不匹配");
+        }
+        Ok(())
     }
 
     #[test]
-    fn test_profile_remove() {
-        let (_temp_dir, mut config) = setup_temp_config();
+    fn test_profile_remove() -> Result<()> {
+        let (_temp_dir, mut config) = setup_temp_config()?;
         let profile = Profile::new(
             None,
             EnvConfig::new(
@@ -169,16 +182,23 @@ mod tests {
             ),
         );
         config.insert_profile("test".to_string(), profile.clone());
-        assert!(config.has_profile("test"));
+        if !config.has_profile("test") {
+            anyhow::bail!("配置档案不存在");
+        }
 
         let removed = config.remove_profile("test");
-        assert_eq!(removed, Some(profile));
-        assert!(!config.has_profile("test"));
+        if removed != Some(profile) {
+            anyhow::bail!("删除的配置档案不匹配");
+        }
+        if config.has_profile("test") {
+            anyhow::bail!("配置档案应已被删除");
+        }
+        Ok(())
     }
 
     #[test]
-    fn test_save_and_load() {
-        let (_temp_dir, mut config) = setup_temp_config();
+    fn test_save_and_load() -> Result<()> {
+        let (_temp_dir, mut config) = setup_temp_config()?;
         let profile = Profile::new(
             Some("echo test".to_string()),
             EnvConfig::new(
@@ -189,9 +209,12 @@ mod tests {
         config.insert_profile("test".to_string(), profile);
         config.current = Some("test".to_string());
 
-        config.save().unwrap();
+        config.save().context("保存配置失败")?;
 
-        let loaded = CccConfig::load().unwrap();
-        assert_eq!(loaded, config);
+        let loaded = CccConfig::load().context("加载配置失败")?;
+        if loaded != config {
+            anyhow::bail!("加载的配置与保存的不匹配");
+        }
+        Ok(())
     }
 }

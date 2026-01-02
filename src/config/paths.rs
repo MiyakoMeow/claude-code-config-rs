@@ -21,7 +21,7 @@ pub const CCC_CONFIG_FILE: &str = "cccrs-config.json";
 #[must_use]
 pub fn get_claude_settings_path() -> PathBuf {
     home_dir()
-        .unwrap_or_else(|| PathBuf::from("."))
+        .unwrap_or_default()
         .join(CLAUDE_DIR)
         .join(SETTINGS_FILE)
 }
@@ -32,7 +32,7 @@ pub fn get_claude_settings_path() -> PathBuf {
 #[must_use]
 pub fn get_ccc_config_path() -> PathBuf {
     home_dir()
-        .unwrap_or_else(|| PathBuf::from("."))
+        .unwrap_or_default()
         .join(CLAUDE_DIR)
         .join(CCC_CONFIG_FILE)
 }
@@ -40,6 +40,10 @@ pub fn get_ccc_config_path() -> PathBuf {
 /// 确保 CCCRS 配置文件存在
 ///
 /// 如果文件不存在，则创建包含初始配置的 JSON 文件
+///
+/// # Errors
+///
+/// 返回文件或目录创建错误
 pub fn ensure_ccc_config_exists() -> std::io::Result<()> {
     let path = get_ccc_config_path();
     if !path.exists() {
