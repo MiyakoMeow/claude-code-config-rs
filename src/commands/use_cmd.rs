@@ -41,22 +41,26 @@ pub fn execute(name: &str) -> anyhow::Result<()> {
         if settings.env.is_none() {
             settings.env = Some(crate::config::ClaudeEnv::default());
         }
-        settings.env.as_mut().unwrap().anthropic_base_url = Some(url.clone());
+        if let Some(env) = settings.env.as_mut() {
+            env.anthropic_base_url = Some(url.clone());
+        }
     }
 
     if let Some(key) = &profile.env.anthropic_api_key {
         if settings.env.is_none() {
             settings.env = Some(crate::config::ClaudeEnv::default());
         }
-        settings.env.as_mut().unwrap().anthropic_api_key = Some(key.clone());
+        if let Some(env) = settings.env.as_mut() {
+            env.anthropic_api_key = Some(key.clone());
+        }
     }
 
     settings.save().context("保存设置失败")?;
 
     // 更新当前配置记录
-    let mut config = CccConfig::load().context("加载配置失败")?;
-    config.current = Some(name.to_string());
-    config.save().context("保存配置失败")?;
+    let mut updated_config = CccConfig::load().context("加载配置失败")?;
+    updated_config.current = Some(name.to_string());
+    updated_config.save().context("保存配置失败")?;
 
     success(&format!("已切换到配置档案: {}", name));
 

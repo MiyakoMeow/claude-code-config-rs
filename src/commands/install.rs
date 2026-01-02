@@ -77,5 +77,5 @@ fn is_writable(path: &Path) -> bool {
     path.parent()
         .and_then(|p| std::fs::metadata(p).ok())
         .map(|m| -> bool { !m.permissions().readonly() })
-        .unwrap_or(false)
+        .unwrap_or_default()
 }

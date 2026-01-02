@@ -13,6 +13,10 @@ use crate::{
 /// 列出所有配置
 ///
 /// 显示当前活跃配置（智能检测）和所有可用配置档案
+///
+/// # Errors
+///
+/// 返回配置文件读取错误
 pub fn execute() -> anyhow::Result<()> {
     println!("=== Claude Code 配置管理 ===");
     println!();
@@ -24,11 +28,9 @@ pub fn execute() -> anyhow::Result<()> {
     let settings_result = ClaudeSettings::load();
 
     // 智能检测当前配置
-    let detected_profile = if let Ok(ref settings) = settings_result {
-        detect_active_profile(&config, settings)
-    } else {
-        None
-    };
+    let detected_profile = settings_result
+        .as_ref()
+        .map_or(None, |settings| detect_active_profile(&config, settings));
 
     // 如果检测到配置且与存储的不同，更新存储的当前配置
     let current_profile = if let Some(detected) = &detected_profile {

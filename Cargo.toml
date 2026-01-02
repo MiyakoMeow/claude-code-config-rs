@@ -29,18 +29,18 @@ tempfile = "3"
 serial_test = "3"
 
 
-[workspace.lints.rust]
+[lints.rust]
 missing_docs = "warn"
 unused_crate_dependencies = "allow"
 unused_extern_crates = "warn"
 
-[workspace.lints.rustdoc]
+[lints.rustdoc]
 broken_intra_doc_links = "deny"
 private_doc_tests = "warn"
 invalid_html_tags = "warn"
 bare_urls = "warn"
 
-[workspace.lints.clippy]
+[lints.clippy]
 # Restriction
 as_conversions = "allow"
 cognitive_complexity = "allow"
@@ -48,7 +48,7 @@ decimal_literal_representation = "warn"
 empty_drop = "warn"
 empty_structs_with_brackets = "warn"
 exit = "warn"
-expect_used = "allow"
+expect_used = "warn"
 float_cmp_const = "warn"
 if_then_some_else_none = "warn"
 indexing_slicing = "warn"
@@ -57,10 +57,10 @@ missing_docs_in_private_items = "allow"
 mod_module_files = "warn"
 module_name_repetitions = "allow"
 mutex_atomic = "warn"
-panic = "allow"
+panic = "warn"
 panic_in_result_fn = "warn"
-print_stderr = "warn"
-print_stdout = "warn"
+print_stderr = "allow"
+print_stdout = "allow"
 rc_buffer = "warn"
 rest_pat_in_fully_bound_structs = "warn"
 self_named_module_files = "allow"
