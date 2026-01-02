@@ -196,26 +196,4 @@ mod tests {
         }
         Ok(())
     }
-
-    #[test]
-    fn test_save_and_load() -> Result<()> {
-        let (_temp_dir, mut config) = setup_temp_config()?;
-        let profile = Profile::new(
-            Some("echo test".to_string()),
-            EnvConfig::new(
-                Some("https://api.test.com".to_string()),
-                Some("sk-test".to_string()),
-            ),
-        );
-        config.insert_profile("test".to_string(), profile);
-        config.current = Some("test".to_string());
-
-        config.save().context("保存配置失败")?;
-
-        let loaded = CccConfig::load().context("加载配置失败")?;
-        if loaded != config {
-            anyhow::bail!("加载的配置与保存的不匹配");
-        }
-        Ok(())
-    }
 }

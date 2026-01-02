@@ -437,3 +437,60 @@ fn test_remove_command_rm_alias() -> Result<()> {
         .stdout(predicate::str::contains("已删除"));
     Ok(())
 }
+
+#[test]
+#[serial]
+fn test_save_and_load_integration() -> Result<()> {
+    use claude_code_config_rs::config::cccrs_config::CccConfig;
+
+    let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home()?;
+
+    // 创建配置并保存
+    let mut config = CccConfig::default();
+    let profile = claude_code_config_rs::config::cccrs_config::Profile::new(
+        Some("echo test".to_string()),
+        claude_code_config_rs::config::cccrs_config::EnvConfig::new(
+            Some("https://api.test.com".to_string()),
+            Some("sk-test".to_string()),
+        ),
+    );
+    config.insert_profile("test".to_string(), profile);
+    config.current = Some("test".to_string());
+
+    config.save().context("保存配置失败")?;
+
+    // 加载配置并验证
+    let loaded = CccConfig::load().context("加载配置失败")?;
+    if loaded != config {
+        anyhow::bail!("加载的配置与保存的不匹配");
+    }
+
+    Ok(())
+}
+
+#[test]
+#[serial]
+fn test_backup_integration() -> Result<()> {
+    use claude_code_config_rs::config::claude_settings::ClaudeSettings;
+
+    let (_temp_dir, settings_path, _ccc_config_path) = setup_temp_home()?;
+
+    // 创建初始 settings.json
+    create_initial_settings(&settings_path)?;
+
+    let settings = ClaudeSettings::default();
+    let backup_path = settings.backup().context("备份失败")?;
+
+    if !backup_path.exists() {
+        anyhow::bail!("备份文件不存在");
+    }
+
+    // 验证备份文件内容
+    let original = std::fs::read_to_string(&settings_path).context("读取原文件失败")?;
+    let backup = std::fs::read_to_string(&backup_path).context("读取备份文件失败")?;
+    if original != backup {
+        anyhow::bail!("备份文件内容与原文件不匹配");
+    }
+
+    Ok(())
+}
