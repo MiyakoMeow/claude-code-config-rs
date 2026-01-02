@@ -1,0 +1,6 @@
+{
+  ".": {
+    "package-name": "claude-code-config-rs",
+    "bump-minor-pre-major": true
+  }
+}
