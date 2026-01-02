@@ -36,7 +36,7 @@ jobs:
             ext: ""
 
           # macOS x86_64 (Intel)
-          - os: macos-13
+          - os: macos-15-intel
             target: x86_64-apple-darwin
             platform: macos
             arch: x86_64
