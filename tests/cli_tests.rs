@@ -15,7 +15,7 @@ fn setup_temp_home() -> (TempDir, PathBuf, PathBuf) {
     let temp_home = temp_dir.path().join("test_home");
     std::fs::create_dir_all(&temp_home).unwrap();
 
-    use claude_code_config_rs::config::paths::{CLAUDE_DIR, CCC_CONFIG_FILE, SETTINGS_FILE};
+    use claude_code_config_rs::config::paths::{CCC_CONFIG_FILE, CLAUDE_DIR, SETTINGS_FILE};
     let claude_dir = temp_home.join(CLAUDE_DIR);
     std::fs::create_dir_all(&claude_dir).unwrap();
 

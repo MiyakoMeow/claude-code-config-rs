@@ -1,6 +1,6 @@
 //! 配置文件路径模块
 //!
-//! 提供 Claude settings 和 CCC 配置文件的路径获取功能
+//! 提供 Claude settings 和 CCCRS 配置文件的路径获取功能
 
 use std::path::PathBuf;
 
@@ -12,7 +12,7 @@ pub const CLAUDE_DIR: &str = ".claude";
 /// Claude settings.json 文件名
 pub const SETTINGS_FILE: &str = "settings.json";
 
-/// CCC 配置文件名
+/// CCCRS 配置文件名
 pub const CCC_CONFIG_FILE: &str = "cccrs-config.json";
 
 /// 获取 Claude settings.json 的路径
@@ -26,7 +26,7 @@ pub fn get_claude_settings_path() -> PathBuf {
         .join(SETTINGS_FILE)
 }
 
-/// 获取 CCC 配置文件的路径
+/// 获取 CCCRS 配置文件的路径
 ///
 /// 返回 `~/.claude/cccrs-config.json`
 #[must_use]
@@ -37,7 +37,7 @@ pub fn get_ccc_config_path() -> PathBuf {
         .join(CCC_CONFIG_FILE)
 }
 
-/// 确保 CCC 配置文件存在
+/// 确保 CCCRS 配置文件存在
 ///
 /// 如果文件不存在，则创建包含初始配置的 JSON 文件
 pub fn ensure_ccc_config_exists() -> std::io::Result<()> {

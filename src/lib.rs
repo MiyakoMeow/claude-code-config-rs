@@ -1,4 +1,4 @@
-//! CCC (Claude Code Config) - Claude 配置管理工具
+//! CCCRS (Claude Code Config Rust) - Claude 配置管理工具
 //!
 //! 用于管理 `~/.claude/settings.json` 中的 API 配置切换
 

@@ -1,6 +1,6 @@
-//! CCC 配置文件模块
+//! CCCRS 配置文件模块
 //!
-//! 定义 CCC 配置数据结构并提供读写功能
+//! 定义 CCCRS 配置数据结构并提供读写功能
 
 use std::collections::HashMap;
 
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::paths::{ensure_ccc_config_exists, get_ccc_config_path};
 
-/// CCC 主配置文件结构
+/// CCCRS 主配置文件结构
 ///
 /// 存储在 `~/.claude/cccrs-config.json`
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]

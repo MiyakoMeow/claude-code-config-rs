@@ -1,6 +1,6 @@
 //! Init 命令
 //!
-//! 初始化 CCC 配置管理
+//! 初始化 CCCRS 配置管理
 
 use crate::{
     config::ensure_ccc_config_exists,
@@ -13,9 +13,9 @@ use crate::{
 pub fn execute() -> anyhow::Result<()> {
     ensure_ccc_config_exists()?;
 
-    info("正在初始化 CCC 配置管理...");
+    info("正在初始化 CCCRS 配置管理...");
 
-    success("CCC 配置管理已初始化");
+    success("CCCRS 配置管理已初始化");
     println!();
     println!("下一步:");
     println!("  1. 添加配置档案 (两种方式):");
