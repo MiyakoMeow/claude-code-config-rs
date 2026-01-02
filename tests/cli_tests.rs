@@ -3,7 +3,7 @@
 //! 使用 `assert_cmd` 进行 CLI 行为测试
 
 use anyhow::{Context, Result};
-use assert_cmd::Command;
+use assert_cmd::{Command, cargo_bin};
 use predicates::prelude::*;
 use serial_test::serial;
 use std::path::PathBuf;
@@ -53,7 +53,7 @@ fn create_initial_settings(path: &PathBuf) -> Result<()> {
 #[test]
 #[serial]
 fn test_help_command() -> Result<()> {
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("help")
         .assert()
         .success()
@@ -69,7 +69,7 @@ fn test_init_command() -> Result<()> {
     // 创建初始 settings.json
     create_initial_settings(&settings_path)?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
     // 验证配置文件创建
@@ -95,12 +95,12 @@ fn test_list_empty() -> Result<()> {
     create_initial_settings(&settings_path)?;
 
     // 先初始化
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
     // list 应该显示无配置档案
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("list")
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("list")
         .assert()
         .success()
         .stdout(predicate::str::contains("可用配置档案"))
@@ -117,12 +117,12 @@ fn test_import_and_list() -> Result<()> {
     create_initial_settings(&settings_path)?;
 
     // 初始化
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
     // 导入当前配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import")
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import")
         .arg("anthropic")
         .assert()
         .success()
@@ -162,8 +162,8 @@ fn test_import_and_list() -> Result<()> {
     }
 
     // list 应该显示配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("list")
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("list")
         .assert()
         .success()
         .stdout(predicate::str::contains("anthropic"))
@@ -180,11 +180,11 @@ fn test_use_command_updates_settings() -> Result<()> {
     create_initial_settings(&settings_path)?;
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import").arg("anthropic").assert().success();
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import").arg("anthropic").assert().success();
 
     // 准备另一个配置
     let config = r#"{
@@ -201,8 +201,8 @@ fn test_use_command_updates_settings() -> Result<()> {
     std::fs::write(&ccc_config_path, config).context("写入配置失败")?;
 
     // 切换到新配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("use")
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("use")
         .arg("new-profile")
         .assert()
         .success()
@@ -264,15 +264,15 @@ fn test_remove_command() -> Result<()> {
     create_initial_settings(&settings_path)?;
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import").arg("test-profile").assert().success();
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import").arg("test-profile").assert().success();
 
     // 删除配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("remove")
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("remove")
         .arg("test-profile")
         .assert()
         .success()
@@ -304,19 +304,19 @@ fn test_remove_current_profile() -> Result<()> {
     create_initial_settings(&settings_path)?;
 
     // 初始化并导入配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import").arg("current").assert().success();
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import").arg("current").assert().success();
 
     // 切换到当前配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("use").arg("current").assert().success();
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("use").arg("current").assert().success();
 
     // 删除当前配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("remove")
+    let mut cmd4 = Command::new(cargo_bin!("cccrs"));
+    cmd4.arg("remove")
         .arg("current")
         .assert()
         .success()
@@ -346,7 +346,7 @@ fn test_remove_current_profile() -> Result<()> {
 fn test_import_nonexistent_profile() -> Result<()> {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home()?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("remove")
         .arg("nonexistent")
         .assert()
@@ -360,7 +360,7 @@ fn test_import_nonexistent_profile() -> Result<()> {
 fn test_use_nonexistent_profile() -> Result<()> {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home()?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("use")
         .arg("nonexistent")
         .assert()
@@ -374,7 +374,7 @@ fn test_use_nonexistent_profile() -> Result<()> {
 fn test_import_invalid_name() -> Result<()> {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home()?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("import")
         .arg("invalid name with spaces")
         .assert()
@@ -387,7 +387,7 @@ fn test_import_invalid_name() -> Result<()> {
 fn test_add_invalid_name() -> Result<()> {
     let (_temp_dir, _settings_path, _ccc_config_path) = setup_temp_home()?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("add").arg("invalid@name").assert().failure();
     Ok(())
 }
@@ -399,15 +399,15 @@ fn test_remove_command_del_alias() -> Result<()> {
 
     create_initial_settings(&settings_path)?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import").arg("test-alias").assert().success();
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import").arg("test-alias").assert().success();
 
     // 使用 del 别名删除配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("del")
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("del")
         .arg("test-alias")
         .assert()
         .success()
@@ -422,15 +422,15 @@ fn test_remove_command_rm_alias() -> Result<()> {
 
     create_initial_settings(&settings_path)?;
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
+    let mut cmd = Command::new(cargo_bin!("cccrs"));
     cmd.arg("init").assert().success();
 
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("import").arg("test-rm-alias").assert().success();
+    let mut cmd2 = Command::new(cargo_bin!("cccrs"));
+    cmd2.arg("import").arg("test-rm-alias").assert().success();
 
     // 使用 rm 别名删除配置
-    let mut cmd = Command::cargo_bin("cccrs").context("获取 cargo 二进制文件失败")?;
-    cmd.arg("rm")
+    let mut cmd3 = Command::new(cargo_bin!("cccrs"));
+    cmd3.arg("rm")
         .arg("test-rm-alias")
         .assert()
         .success()
