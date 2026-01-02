@@ -116,7 +116,7 @@ pub fn execute() -> anyhow::Result<()> {
 
 /// 智能检测当前活跃的配置
 ///
-/// 通过比较 settings.json 和 ccc-config.json 中的配置来检测
+/// 通过比较 settings.json 和 cccrs-config.json 中的配置来检测
 #[must_use]
 fn detect_active_profile(config: &CccConfig, settings: &ClaudeSettings) -> Option<String> {
     // 获取当前 settings 中的配置

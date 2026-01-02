@@ -69,7 +69,7 @@ ccc rm <配置名称>
 ## 配置文件
 
 ### CCC 配置文件
-位置：`~/.claude/ccc-config.json`
+位置：`~/.claude/cccrs-config.json`
 
 ```json
 {
@@ -129,7 +129,7 @@ ccc rm old-config
 ## 智能检测
 
 `ccc list` 命令会自动检测当前活跃配置：
-- 通过比较 settings.json 和 ccc-config.json 中的配置
+- 通过比较 settings.json 和 cccrs-config.json 中的配置
 - 如果检测到匹配的配置，会自动更新 `current` 字段
 
 ## 开发

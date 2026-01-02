@@ -11,7 +11,7 @@ use super::paths::{ensure_ccc_config_exists, get_ccc_config_path};
 
 /// CCC 主配置文件结构
 ///
-/// 存储在 `~/.claude/ccc-config.json`
+/// 存储在 `~/.claude/cccrs-config.json`
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct CccConfig {
     /// 所有配置档案

@@ -9,7 +9,7 @@ use crate::{
 
 /// 初始化命令
 ///
-/// 创建 `~/.claude/ccc-config.json` 配置文件
+/// 创建 `~/.claude/cccrs-config.json` 配置文件
 pub fn execute() -> anyhow::Result<()> {
     ensure_ccc_config_exists()?;
 

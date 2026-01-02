@@ -7,7 +7,7 @@ set -euo pipefail
 
 readonly SCRIPT_NAME="ccc"
 readonly CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-readonly CCC_CONFIG="$HOME/.claude/ccc-config.json"
+readonly CCC_CONFIG="$HOME/.claude/cccrs-config.json"
 
 # 颜色定义
 readonly RED='\033[0;31m'
@@ -101,7 +101,7 @@ CCC (Claude Code Config) - Claude 配置管理工具
     $SCRIPT_NAME rm old-config
 
 注意:
-    - 配置文件存储在 ~/.claude/ccc-config.json
+    - 配置文件存储在 ~/.claude/cccrs-config.json
     - 只会修改 apiKeyHelper 和 env.ANTHROPIC_* 字段
     - 其他 settings.json 字段保持不变
 EOF

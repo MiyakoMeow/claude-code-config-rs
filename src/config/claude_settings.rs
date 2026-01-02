@@ -114,10 +114,11 @@ mod tests {
             std::env::set_var("HOME", temp_home.to_string_lossy().as_ref());
         }
 
-        let claude_dir = temp_home.join(".claude");
+        use crate::config::paths::{CLAUDE_DIR, SETTINGS_FILE};
+        let claude_dir = temp_home.join(CLAUDE_DIR);
         std::fs::create_dir_all(&claude_dir).unwrap();
 
-        let settings_path = claude_dir.join("settings.json");
+        let settings_path = claude_dir.join(SETTINGS_FILE);
         std::fs::write(&settings_path, r#"{"otherField":"value"}"#).unwrap();
 
         (temp_dir, ClaudeSettings::default())

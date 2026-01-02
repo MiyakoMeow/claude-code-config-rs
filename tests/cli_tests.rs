@@ -15,11 +15,12 @@ fn setup_temp_home() -> (TempDir, PathBuf, PathBuf) {
     let temp_home = temp_dir.path().join("test_home");
     std::fs::create_dir_all(&temp_home).unwrap();
 
-    let claude_dir = temp_home.join(".claude");
+    use claude_code_config_rs::config::paths::{CLAUDE_DIR, CCC_CONFIG_FILE, SETTINGS_FILE};
+    let claude_dir = temp_home.join(CLAUDE_DIR);
     std::fs::create_dir_all(&claude_dir).unwrap();
 
-    let settings_path = claude_dir.join("settings.json");
-    let ccc_config_path = claude_dir.join("ccc-config.json");
+    let settings_path = claude_dir.join(SETTINGS_FILE);
+    let ccc_config_path = claude_dir.join(CCC_CONFIG_FILE);
 
     // 设置 HOME 环境变量 (Unix/Linux)
     unsafe {
@@ -191,7 +192,8 @@ fn test_use_command_updates_settings() {
     assert_eq!(settings["otherField"], "should remain");
 
     // 验证备份文件已创建
-    let backups: Vec<_> = std::fs::read_dir(temp_dir.path().join("test_home/.claude"))
+    use claude_code_config_rs::config::paths::CLAUDE_DIR;
+    let backups: Vec<_> = std::fs::read_dir(temp_dir.path().join("test_home").join(CLAUDE_DIR))
         .unwrap()
         .filter_map(|e| e.ok())
         .map(|e| e.path())

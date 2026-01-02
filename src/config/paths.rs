@@ -7,13 +7,13 @@ use std::path::PathBuf;
 use home::home_dir;
 
 /// Claude 配置目录名称
-const CLAUDE_DIR: &str = ".claude";
+pub const CLAUDE_DIR: &str = ".claude";
 
 /// Claude settings.json 文件名
-const SETTINGS_FILE: &str = "settings.json";
+pub const SETTINGS_FILE: &str = "settings.json";
 
 /// CCC 配置文件名
-const CCC_CONFIG_FILE: &str = "ccc-config.json";
+pub const CCC_CONFIG_FILE: &str = "cccrs-config.json";
 
 /// 获取 Claude settings.json 的路径
 ///
@@ -28,7 +28,7 @@ pub fn get_claude_settings_path() -> PathBuf {
 
 /// 获取 CCC 配置文件的路径
 ///
-/// 返回 `~/.claude/ccc-config.json`
+/// 返回 `~/.claude/cccrs-config.json`
 #[must_use]
 pub fn get_ccc_config_path() -> PathBuf {
     home_dir()
@@ -81,5 +81,23 @@ mod tests {
         assert!(!validate_profile_name("hello world"));
         assert!(!validate_profile_name("test@123"));
         assert!(!validate_profile_name("test.name"));
+    }
+
+    #[test]
+    fn test_public_constants() {
+        // 验证公开常量可以被访问
+        assert_eq!(CLAUDE_DIR, ".claude");
+        assert_eq!(SETTINGS_FILE, "settings.json");
+        assert_eq!(CCC_CONFIG_FILE, "cccrs-config.json");
+    }
+
+    #[test]
+    fn test_path_functions() {
+        // 验证路径函数返回正确的路径
+        let settings_path = get_claude_settings_path();
+        assert!(settings_path.ends_with(".claude/settings.json"));
+
+        let ccc_config_path = get_ccc_config_path();
+        assert!(ccc_config_path.ends_with(".claude/cccrs-config.json"));
     }
 }
