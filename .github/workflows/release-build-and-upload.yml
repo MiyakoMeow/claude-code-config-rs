@@ -36,7 +36,7 @@ jobs:
             ext: ""
 
           # macOS x86_64 (Intel)
-          - os: macos-13
+          - os: macos-15-intel
             target: x86_64-apple-darwin
             platform: macos
             arch: x86_64
@@ -49,9 +49,71 @@ jobs:
             arch: aarch64
             ext: ""
 
+          # Windows x86 (i686)
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            platform: windows
+            arch: x86
+            ext: .exe
+
+          # Linux x86 (i686)
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+            platform: linux
+            arch: x86
+            ext: ""
+            cross: true
+
+          # Linux aarch64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            platform: linux
+            arch: aarch64
+            ext: ""
+            cross: true
+
+          # Linux loongarch64
+          - os: ubuntu-latest
+            target: loongarch64-unknown-linux-gnu
+            platform: linux
+            arch: loongarch64
+            ext: ""
+            cross: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Install cross-compilation tools (Linux)
+        if: matrix.os == 'ubuntu-latest' && matrix.cross == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-multilib \
+            g++-multilib \
+            libc6-dev-i386 \
+            qemu-user \
+            binfmt-support \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            gcc-loongarch64-linux-gnu \
+            g++-loongarch64-linux-gnu || true
+
+      - name: Verify LoongArch64 toolchain
+        if: matrix.target == 'loongarch64-unknown-linux-gnu'
+        run: |
+          if ! command -v loongarch64-linux-gnu-gcc &> /dev/null; then
+            echo "LoongArch64 toolchain not found, downloading prebuilt..."
+            wget -q https://github.com/loongson/build-tools/releases/download/2023.08.08/loongarch64-linux-gnu-gcc.tar.xz
+            tar -xf loongarch64-linux-gnu-gcc.tar.xz
+            echo "$GITHUB_WORKSPACE/loongarch64-linux-gnu-gcc/bin" >> $GITHUB_PATH
+          fi
+          loongarch64-linux-gnu-gcc --version
+
+      - name: Configure static linking for Linux cross-compilation
+        if: matrix.os == 'ubuntu-latest' && matrix.cross == true
+        run: |
+          echo "RUSTFLAGS=-C target-feature=-crt-static" >> $GITHUB_ENV
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@v1
@@ -63,7 +125,11 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-          key: ${{ matrix.target }}
+          key: "${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}"
+
+      - name: Verify Rust target
+        run: |
+          rustup target list --installed | grep "${{ matrix.target }}"
 
       - name: Build release binary
         run: cargo build --release --target ${{ matrix.target }}
