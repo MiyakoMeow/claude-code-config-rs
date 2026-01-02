@@ -2,6 +2,9 @@
 
 用于管理 Claude Code 配置的命令行工具，支持在多个 API 配置档案之间快速切换。
 
+该项目是 [Claude Code Config](https://github.com/yoyooyooo/claude-code-config)
+的 Rust 重写版本，用于额外支持 Windows 平台。
+
 ## 功能特性
 
 - **多配置管理**: 创建和管理多个 API 配置档案
