@@ -165,7 +165,7 @@ jobs:
           echo "Uploaded: ${{ env.ASSET_NAME }}"
 
       - name: Upload build artifact for debugging
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: build-${{ matrix.platform }}-${{ matrix.arch }}
